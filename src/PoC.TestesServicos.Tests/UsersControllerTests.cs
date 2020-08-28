@@ -15,7 +15,7 @@ namespace PoC.TestesServicos.Tests
         {
         }
 
-
+      
         [Fact]
         public async Task GetUsers_NoUsers_ShouldReturnOk()
         {
@@ -35,7 +35,7 @@ namespace PoC.TestesServicos.Tests
 
             Assert.Single(users);
         }
-
+     
         [Fact]
         public async Task GetUsers_TwoUsersInDb_ShouldReturnTwoAddedUsers()
         {

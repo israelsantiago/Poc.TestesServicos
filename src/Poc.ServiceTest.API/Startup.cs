@@ -4,6 +4,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using PoC.TestesServicos.API.Configs;
+using PoC.TestesServicos.Core.Interfaces;
+using PoC.TestesServicos.Core.Services;
 using PoC.TestesServicos.Data;
 using PoC.TestesServicos.Data.Couchbase.Providers;
 using PoC.TestesServicos.Data.Couchbase.Repositories;
@@ -22,11 +24,17 @@ namespace PoC.TestesServicos.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            
+            services.Configure<CepApiOptions>(Configuration.GetSection(nameof(CepApiOptions)));
+            
             services.AddDbContext<UsersDataContext>();
             services.AddSingleton<IContextConfiguration, DataContextConfiguration>();
 
             services.AddSingleton<ICouchbaseProvider, CouchbaseProvider>();
             services.AddSingleton<IDocumentsRepository, DocumentsRepository>();
+            
+            services.AddTransient<ICustomerService, CustomerService>(); 
+            services.AddTransient<ICepService, CepService>();            
 
             services.AddControllers();
         }

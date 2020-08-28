@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\PoC.TestesServicos.Core\PoC.TestesServicos.Core.csproj" />
     <ProjectReference Include="..\PoC.TestesServicos.Data\PoC.TestesServicos.Data.csproj" />
   </ItemGroup>
 
