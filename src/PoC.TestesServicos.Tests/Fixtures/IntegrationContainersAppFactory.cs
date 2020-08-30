@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
@@ -29,8 +30,8 @@ namespace PoC.TestesServicos.Tests.Fixtures
         
         public WireMockServer MockServer { get; private set; }        
         private const string CEP_API_URL_SECTION = "CepApiOptions:Url";      
-        private const string API_CLIENT_URL = "http://localhost:5348";
-    public IntegrationContainersAppFactory()
+  
+   public IntegrationContainersAppFactory()
         {
             mssqlContainerFixture = new MssqlContainerFixture();
             couchbaseContainerFixture = new CouchbaseContainerFixture();
@@ -40,16 +41,28 @@ namespace PoC.TestesServicos.Tests.Fixtures
 
         public async Task InitializeAsync()
         {
-            await mssqlContainerFixture.InitializeAsync();
+            
+            var task1 =  mssqlContainerFixture.InitializeAsync();
+            var task2 =  couchbaseContainerFixture.InitializeAsync();            
+            
+            Task allTasks = Task.WhenAll(task1, task2);
+            
+            try
+            {
+                await allTasks;
+            }
+            catch
+            {
+                AggregateException allExceptions = allTasks.Exception;
+            }            
+            
             ConnectionStringDB = mssqlContainerFixture.Container.ConnectionString;
             TestContextConfigurationDB = new TestContextConfiguration(ConnectionStringDB);
 
-            await couchbaseContainerFixture.InitializeAsync();
             var ConnectionStringCouchBase = couchbaseContainerFixture.Container.ConnectionString;
-
+            
             Client = CreateClient();
-            Client.BaseAddress = new Uri(API_CLIENT_URL);
-
+ 
             using (var scope = Server.Host.Services.CreateScope())
             {
                 var scopedServices = scope.ServiceProvider;
@@ -64,9 +77,12 @@ namespace PoC.TestesServicos.Tests.Fixtures
         {
             mssqlContainerFixture.DisposeAsync();
             couchbaseContainerFixture.DisposeAsync();
-            Client.Dispose();            
+            
+            Client.Dispose();        
+            
             MockServer.Stop();
-            MockServer.Dispose();            
+            MockServer.Dispose();       
+            
             return Task.CompletedTask;
         }
 
@@ -76,11 +92,9 @@ namespace PoC.TestesServicos.Tests.Fixtures
             
             builder.ConfigureTestServices(services =>
             {
-                // Utilizar configs do DB SQL Server criado pelo TestContainer
                 var serviceProvider = services.BuildServiceProvider();
                 services.Replace(new ServiceDescriptor(typeof(IContextConfiguration), TestContextConfigurationDB));
 
-                // Utilizar configs do DB Couchbase criado pelo TestContainer
                 var configuration = serviceProvider.GetRequiredService<IConfiguration>();
                 configuration["Couchbase:Hosts"] = "localhost";
                 configuration["Couchbase:Username"] = couchbaseContainerFixture.Container.Username;
@@ -91,7 +105,7 @@ namespace PoC.TestesServicos.Tests.Fixtures
             }).ConfigureAppConfiguration((context, configbuilder) =>
             {
                 configbuilder.AddInMemoryCollection(extraConfiguration);
-            });
+            }).UseUrls("http://*:0");
          
         }
         
@@ -105,10 +119,7 @@ namespace PoC.TestesServicos.Tests.Fixtures
             };
 
             WireMockServer mockServer = WireMockServer.Start(settings);
-            var porta = mockServer.Ports.Single();
-            var url = mockServer.Urls.Single();
             mockServer.ReadStaticMappings("Mappings/");
-            
 
             return mockServer;
                 

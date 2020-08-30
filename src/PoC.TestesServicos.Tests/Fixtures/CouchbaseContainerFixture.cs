@@ -33,24 +33,6 @@ namespace PoC.TestesServicos.Tests.Fixtures
         public async Task InitializeAsync()
         {
             await Container.StartAsync();
-
-            /*
-            using (var cluster = await Cluster.ConnectAsync(
-                this.Container.ConnectionString,
-                this.Container.Username,
-                this.Container.Password))
-            {
-                var buckets = await cluster.Buckets.GetAllBucketsAsync();
-
-                await using (var bucket = await cluster.BucketAsync("customers"))
-                {
-                    var collection = bucket.DefaultCollection();
-
-                    //await cluster.QueryAsync<long>($"CREATE PRIMARY INDEX `#primary` ON `customers`");
-
-                }
-            }
-            */
         }
 
         public Task DisposeAsync()
