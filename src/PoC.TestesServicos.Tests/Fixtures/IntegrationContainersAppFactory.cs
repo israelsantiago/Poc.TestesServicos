@@ -19,22 +19,25 @@ using Xunit;
 
 namespace PoC.TestesServicos.Tests.Fixtures
 {
-    public class IntegrationContainersAppFactory : WebApplicationFactory<Startup>, IAsyncLifetime
+    public class IntegrationContainersAppFactory : WebApplicationFactory<Startup>,  IAsyncLifetime
     {
         
         public MssqlContainerFixture mssqlContainerFixture { get; }
         public string ConnectionStringDB { get; private set; }
         public CouchbaseContainerFixture couchbaseContainerFixture { get; }
         public TestContextConfiguration TestContextConfigurationDB { get; private set; }
+
+        private RabbitmqContainerFixture rabbitmqContainerFixture { get; }        
         public HttpClient Client { get; private set; }
         
         public WireMockServer MockServer { get; private set; }        
         private const string CEP_API_URL_SECTION = "CepApiOptions:Url";      
   
-   public IntegrationContainersAppFactory()
+        public IntegrationContainersAppFactory()
         {
             mssqlContainerFixture = new MssqlContainerFixture();
             couchbaseContainerFixture = new CouchbaseContainerFixture();
+            rabbitmqContainerFixture = new RabbitmqContainerFixture();
             MockServer = SetupMockedServer();            
            
         }
@@ -42,10 +45,11 @@ namespace PoC.TestesServicos.Tests.Fixtures
         public async Task InitializeAsync()
         {
             
-            var task1 =  mssqlContainerFixture.InitializeAsync();
-            var task2 =  couchbaseContainerFixture.InitializeAsync();            
+            var task1 = mssqlContainerFixture.InitializeAsync();
+            var task2 = couchbaseContainerFixture.InitializeAsync();
+            var task3 = rabbitmqContainerFixture.InitializeAsync();
             
-            Task allTasks = Task.WhenAll(task1, task2);
+            Task allTasks = Task.WhenAll(task1, task2, task3);
             
             try
             {
@@ -77,13 +81,16 @@ namespace PoC.TestesServicos.Tests.Fixtures
         {
             mssqlContainerFixture.DisposeAsync();
             couchbaseContainerFixture.DisposeAsync();
+            rabbitmqContainerFixture.DisposeAsync();            
             
             Client.Dispose();        
+            
+            base.Dispose();
             
             MockServer.Stop();
             MockServer.Dispose();       
             
-            return Task.CompletedTask;
+             return Task.CompletedTask;
         }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)

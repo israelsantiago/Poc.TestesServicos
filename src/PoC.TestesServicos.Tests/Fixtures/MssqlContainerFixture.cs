@@ -8,9 +8,12 @@ namespace PoC.TestesServicos.Tests.Fixtures
 {
     public class MssqlContainerFixture : IAsyncLifetime
     {
+
+        public MsSqlTestcontainer Container { get; }        
         public MssqlContainerFixture()
         {
             var testcontainersBuilder = new TestcontainersBuilder<MsSqlTestcontainer>()
+                    //.WithImage() -- Alterar para a imagem do BS2
                     .WithDatabase(new MsSqlTestcontainerConfiguration
                     {
                         Password =
@@ -20,8 +23,6 @@ namespace PoC.TestesServicos.Tests.Fixtures
 
             Container = testcontainersBuilder.Build();
         }
-
-        public MsSqlTestcontainer Container { get; }
 
         public Task InitializeAsync()
         {

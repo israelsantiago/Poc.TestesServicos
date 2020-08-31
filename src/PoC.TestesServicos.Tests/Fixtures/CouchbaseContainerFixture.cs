@@ -8,9 +8,12 @@ namespace PoC.TestesServicos.Tests.Fixtures
 {
     public class CouchbaseContainerFixture : IAsyncLifetime
     {
+        public CouchbaseTestcontainer Container { get; }
+        
         public CouchbaseContainerFixture()
         {
             var testcontainersBuilder = new TestcontainersBuilder<CouchbaseTestcontainer>()
+                    //.WithImage()  -- Alterar para a imagem do BS2
                     .WithDatabase(new CouchbaseTestcontainerConfiguration
                     {
                         Username = "couchbase",
@@ -27,8 +30,6 @@ namespace PoC.TestesServicos.Tests.Fixtures
 
             Container = testcontainersBuilder.Build();
         }
-
-        public CouchbaseTestcontainer Container { get; }
 
         public async Task InitializeAsync()
         {
