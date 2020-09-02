@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Couchbase;
 using Microsoft.Extensions.Configuration;
 
@@ -24,18 +26,32 @@ namespace PoC.TestesServicos.Data.Couchbase.Providers
             var username = _configuration.GetValue<string>("Couchbase:Username");
             var password = _configuration.GetValue<string>("Couchbase:Password");
             var uiPort = _configuration.GetValue<int>("Couchbase:UIPort");
+            //   // $"{hosts}:{uiPort}"
 
-            //
-            // _cluster = await Cluster.ConnectAsync("couchbase://localhost", username, password);
+            //var teste = $"127.0.0.1:{uiPort}";
+            
+            //127.0.0.1:8091 
+            //$"http://localhost:{uiPort}"
+            //$"http://localhost:{uiPort}"
+            
+            //_cluster = await Cluster.ConnectAsync($"http://localhost:{uiPort}" , 
+             //                                      username, password);
 
-            _cluster = await Cluster.ConnectAsync($"{hosts}", new ClusterOptions
-            {
-                BootstrapHttpPort = uiPort,
-                UserName = username,
-                Password = password
-            });
+            var options = new ClusterOptions().WithBuckets("customers")
+                                              .WithCredentials("couchbase", "couchbase")
+                                              .WithConnectionString($"http://localhost:{uiPort}");
+                
+             //options.BootstrapHttpPort = uiPort;
+             //options.BootstrapHttpPortTls = uiPort;
 
-
+             options.KvTimeout = TimeSpan.FromSeconds(60);
+             options.KvConnectTimeout = TimeSpan.FromSeconds(60);
+   
+ 
+            ICluster cluster = await Cluster.ConnectAsync(options).ConfigureAwait(false);
+            await cluster.WaitUntilReadyAsync(TimeSpan.FromSeconds(60));            
+            
+  
             return _cluster;
         }
 

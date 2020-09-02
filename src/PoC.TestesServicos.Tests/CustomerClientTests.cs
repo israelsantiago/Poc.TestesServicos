@@ -1,18 +1,22 @@
 ﻿using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using PoC.TestesServicos.API;
 using PoC.TestesServicos.Data.Models;
 using PoC.TestesServicos.Tests.Fixtures;
 using Xunit;
 
 namespace PoC.TestesServicos.Tests
 {
-    [Collection("Integration containers collection")]
+    [Collection(nameof(IntegrationApiTestFixtureCollection))]
     public class CustomerClientTests : ControllerTestsBase
     {
-        public CustomerClientTests(IntegrationContainersAppFactory integrationContainersFixture) 
-            : base(integrationContainersFixture)
+        private readonly IntegrationTestFixture<StartupApiTests> _integrationTestFixture;
+        
+        public CustomerClientTests(IntegrationTestFixture<StartupApiTests> integrationTestFixture) 
+            : base(integrationTestFixture)
         {
+            _integrationTestFixture = integrationTestFixture;
         }
         
         [Theory]

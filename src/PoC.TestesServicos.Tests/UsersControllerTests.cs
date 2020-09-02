@@ -1,5 +1,6 @@
 using System.Net;
 using System.Threading.Tasks;
+using PoC.TestesServicos.API;
 using PoC.TestesServicos.Data.Models;
 using PoC.TestesServicos.Tests.Extensions;
 using PoC.TestesServicos.Tests.Fixtures;
@@ -7,12 +8,15 @@ using Xunit;
 
 namespace PoC.TestesServicos.Tests
 {
-    [Collection("Integration containers collection")]
+    [Collection(nameof(IntegrationApiTestFixtureCollection))]
     public class UsersControllerTests : ControllerTestsBase
     {
-        public UsersControllerTests(IntegrationContainersAppFactory integrationContainersFixture)
-            : base(integrationContainersFixture)
+        private readonly IntegrationTestFixture<StartupApiTests> _integrationTestFixture;
+        
+        public UsersControllerTests(IntegrationTestFixture<StartupApiTests> integrationTestFixture) 
+            : base(integrationTestFixture)
         {
+            _integrationTestFixture = integrationTestFixture;
         }
 
       

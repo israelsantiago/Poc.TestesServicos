@@ -1,97 +1,35 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using PoC.TestesServicos.API;
 using PoC.TestesServicos.Data;
-using WireMock.Server;
-using WireMock.Settings;
-using Xunit;
 
 namespace PoC.TestesServicos.Tests.Fixtures
 {
-    public class IntegrationContainersAppFactory : WebApplicationFactory<Startup>,  IAsyncLifetime
+    public class IntegrationContainersAppFactory<TStartup> : WebApplicationFactory<Startup> where TStartup : class
     {
-        
-        public MssqlContainerFixture mssqlContainerFixture { get; }
-        public string ConnectionStringDB { get; private set; }
-        public CouchbaseContainerFixture couchbaseContainerFixture { get; }
-        public TestContextConfiguration TestContextConfigurationDB { get; private set; }
-
-        private RabbitmqContainerFixture rabbitmqContainerFixture { get; }        
-        public HttpClient Client { get; private set; }
-        
-        public WireMockServer MockServer { get; private set; }        
-        private const string CEP_API_URL_SECTION = "CepApiOptions:Url";      
-  
-        public IntegrationContainersAppFactory()
+        private readonly TestContextConfiguration _testtontexttonfiguration;
+        private readonly string _usernamecouchbase;
+        private readonly string _passwordCouchbase;
+        private readonly string _mockeserverurl;
+        private readonly int _restportcouchbase;
+        public IntegrationContainersAppFactory(TestContextConfiguration testContextConfigurationDb,
+                                               string userNameCouchBase, string passwordCouchbase, 
+                                               int restPortCouchbase, string mockeServerUrl)
         {
-            mssqlContainerFixture = new MssqlContainerFixture();
-            couchbaseContainerFixture = new CouchbaseContainerFixture();
-            rabbitmqContainerFixture = new RabbitmqContainerFixture();
-            MockServer = SetupMockedServer();            
-           
+            _testtontexttonfiguration = testContextConfigurationDb;
+            _usernamecouchbase = userNameCouchBase;
+            _passwordCouchbase = passwordCouchbase;
+            _mockeserverurl = mockeServerUrl;
+            _restportcouchbase = restPortCouchbase;
+
         }
 
-        public async Task InitializeAsync()
-        {
-            
-            var task1 = mssqlContainerFixture.InitializeAsync();
-            var task2 = couchbaseContainerFixture.InitializeAsync();
-            var task3 = rabbitmqContainerFixture.InitializeAsync();
-            
-            Task allTasks = Task.WhenAll(task1, task2, task3);
-            
-            try
-            {
-                await allTasks;
-            }
-            catch
-            {
-                AggregateException allExceptions = allTasks.Exception;
-            }            
-            
-            ConnectionStringDB = mssqlContainerFixture.Container.ConnectionString;
-            TestContextConfigurationDB = new TestContextConfiguration(ConnectionStringDB);
-
-            var ConnectionStringCouchBase = couchbaseContainerFixture.Container.ConnectionString;
-            
-            Client = CreateClient();
- 
-            using (var scope = Server.Host.Services.CreateScope())
-            {
-                var scopedServices = scope.ServiceProvider;
-                var context = scopedServices
-                    .GetRequiredService<UsersDataContext>();
-
-                context.Database.Migrate();
-            }
-        }
-
-        public Task DisposeAsync()
-        {
-            mssqlContainerFixture.DisposeAsync();
-            couchbaseContainerFixture.DisposeAsync();
-            rabbitmqContainerFixture.DisposeAsync();            
-            
-            Client.Dispose();        
-            
-            base.Dispose();
-            
-            MockServer.Stop();
-            MockServer.Dispose();       
-            
-             return Task.CompletedTask;
-        }
+        private const string CEP_API_URL_SECTION = "CepApiOptions:Url";           
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
@@ -100,36 +38,23 @@ namespace PoC.TestesServicos.Tests.Fixtures
             builder.ConfigureTestServices(services =>
             {
                 var serviceProvider = services.BuildServiceProvider();
-                services.Replace(new ServiceDescriptor(typeof(IContextConfiguration), TestContextConfigurationDB));
-
+                services.Replace(new ServiceDescriptor(typeof(IContextConfiguration), _testtontexttonfiguration));
+   
                 var configuration = serviceProvider.GetRequiredService<IConfiguration>();
                 configuration["Couchbase:Hosts"] = "localhost";
-                configuration["Couchbase:Username"] = couchbaseContainerFixture.Container.Username;
-                configuration["Couchbase:Password"] = couchbaseContainerFixture.Container.Password;
-                configuration["Couchbase:UIPort"] = "8091";
+                configuration["Couchbase:Username"] = _usernamecouchbase;
+                configuration["Couchbase:Password"] = _passwordCouchbase;
+                configuration["Couchbase:UIPort"] = _restportcouchbase.ToString();
                 services.Replace(new ServiceDescriptor(typeof(IConfiguration), configuration));
 
             }).ConfigureAppConfiguration((context, configbuilder) =>
             {
                 configbuilder.AddInMemoryCollection(extraConfiguration);
-            }).UseUrls("http://*:0");
-         
-        }
-        
-        private WireMockServer SetupMockedServer()
-        {
-            FluentMockServerSettings settings = new FluentMockServerSettings()
-            {
-                ReadStaticMappings = true,
-                StartAdminInterface = true,
-                WatchStaticMappings = true,                
-            };
-
-            WireMockServer mockServer = WireMockServer.Start(settings);
-            mockServer.ReadStaticMappings("Mappings/");
-
-            return mockServer;
                 
+            }).UseUrls("http://*:0")
+              .UseStartup<TStartup>()
+              .UseEnvironment("Development");
+            
         }
         
         /// <summary>
@@ -138,11 +63,10 @@ namespace PoC.TestesServicos.Tests.Fixtures
         /// <returns></returns>
         private Dictionary<string, string> GetApiClientExtraConfiguration()
         {
-            string requestUrl = MockServer.Urls.Single();
             Dictionary<string, string> configuration = new Dictionary<string, string>();
-            configuration.Add(CEP_API_URL_SECTION, requestUrl);
+            configuration.Add(CEP_API_URL_SECTION, _mockeserverurl);
             return configuration;
-        }            
-        
+        }
+
     }
 }

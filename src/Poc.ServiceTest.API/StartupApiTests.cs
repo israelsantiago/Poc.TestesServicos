@@ -12,14 +12,15 @@ using PoC.TestesServicos.Data.Couchbase.Repositories;
 
 namespace PoC.TestesServicos.API
 {
-    public class Startup
+    public class StartupApiTests
     {
-        public Startup(IConfiguration configuration)
+        public StartupApiTests(IConfiguration configuration)
         {
             Configuration = configuration;
         }
 
         public IConfiguration Configuration { get; }
+        
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -50,7 +51,6 @@ namespace PoC.TestesServicos.API
             app.UseEndpoints(endpoints =>
                 endpoints.MapControllers());
         }
-        
-        
+
     }
 }
