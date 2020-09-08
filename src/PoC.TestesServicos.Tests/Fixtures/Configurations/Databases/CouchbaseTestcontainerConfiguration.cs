@@ -16,17 +16,16 @@ namespace PoC.TestesServicos.Tests.Fixtures.Configurations.Databases
     private const int DefaultClusterEventingRamSize = 256;
     private const int DefaultClusterFtsRamSize = 256;
     private const int DefaultClusterAnalyticsRamSize = 1024;
-    //private const int BootstrapHttpPort = 8091;
+    private const int BootstrapHttpPort = 8091;
     private readonly MemoryStream stdout = new MemoryStream();
     private readonly MemoryStream stderr = new MemoryStream();
 
-    //public static int BootstrapHttpPort { get; set; } 
-      
     public CouchbaseTestcontainerConfiguration(int defaultPort, int port)
-      : base("mustafaonuraydin/couchbase-testcontainer:6.5.1",  defaultPort, port)
+      : base(CouchbaseImage,  defaultPort, port)
     {
       this.OutputConsumer = Consume.RedirectStdoutAndStderrToStream((Stream) this.stderr, (Stream) this.stdout);
-      this.WaitStrategy = Wait.ForUnixContainer().UntilMessageIsLogged(this.OutputConsumer.Stdout, "couchbase-dev started");
+      //this.WaitStrategy = Wait.ForUnixContainer().unUntilMessageIsLogged(this.OutputConsumer.Stdout, WaitUntilMessageIsLogged);
+      this.WaitStrategy = Wait.ForUnixContainer().UntilPortIsAvailable(8091);
     }
 
     public string BucketName

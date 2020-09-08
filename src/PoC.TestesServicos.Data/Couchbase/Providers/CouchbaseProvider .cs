@@ -21,40 +21,14 @@ namespace PoC.TestesServicos.Data.Couchbase.Providers
         {
             if (_cluster != null) return _cluster;
 
-
             var hosts = _configuration.GetValue<string>("Couchbase:Hosts");
             var username = _configuration.GetValue<string>("Couchbase:Username");
             var password = _configuration.GetValue<string>("Couchbase:Password");
-            var uiPort = _configuration.GetValue<int>("Couchbase:UIPort");
-            //   // $"{hosts}:{uiPort}"
-
-            //var teste = $"127.0.0.1:{uiPort}";
+           
+            _cluster = await Cluster.ConnectAsync(hosts, username, password).ConfigureAwait(false);
             
-            //127.0.0.1:8091 
-            //$"http://localhost:{uiPort}"
-            //$"http://localhost:{uiPort}"
-            
-            //_cluster = await Cluster.ConnectAsync($"http://localhost:{uiPort}" , 
-             //                                      username, password);
-
-            var options = new ClusterOptions().WithBuckets("customers")
-                                              .WithCredentials("couchbase", "couchbase")
-                                              .WithConnectionString($"http://localhost:{uiPort}");
-                
-             //options.BootstrapHttpPort = uiPort;
-             //options.BootstrapHttpPortTls = uiPort;
-
-             options.KvTimeout = TimeSpan.FromSeconds(60);
-             options.KvConnectTimeout = TimeSpan.FromSeconds(60);
-   
- 
-            ICluster cluster = await Cluster.ConnectAsync(options).ConfigureAwait(false);
-            await cluster.WaitUntilReadyAsync(TimeSpan.FromSeconds(60));            
-            
-  
             return _cluster;
         }
-
 
         public async Task<IBucket> GetBucket()
         {
@@ -63,8 +37,8 @@ namespace PoC.TestesServicos.Data.Couchbase.Providers
                 var bucketName = _configuration.GetValue<string>("Couchbase:BucketName");
 
                 var cluster = await GetCluster();
-
-                _bucket = await cluster.BucketAsync(bucketName);
+                
+                _bucket = await cluster.BucketAsync(bucketName).ConfigureAwait(false);
             }
 
             return _bucket;

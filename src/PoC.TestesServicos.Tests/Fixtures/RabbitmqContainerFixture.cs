@@ -15,6 +15,7 @@ namespace PoC.TestesServicos.Tests.Fixtures
         public RabbitmqContainerFixture()
         {
             var testcontainersBuilder = new TestcontainersBuilder<RabbitMqTestcontainer>()
+                //TODO .WithImage() -- Alterar para a imagem do BS2
                 .WithMessageBroker(new RabbitMqTestcontainerConfiguration
                 {
                     Username = "rabbitmq",

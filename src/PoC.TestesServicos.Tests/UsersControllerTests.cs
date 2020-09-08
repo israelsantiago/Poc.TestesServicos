@@ -1,3 +1,4 @@
+using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 using PoC.TestesServicos.API;
@@ -47,7 +48,7 @@ namespace PoC.TestesServicos.Tests
             Context.Add(user);
             Context.SaveChanges();
 
-            var user2 = new User {FirstName = "Israel", LastName = "Santiago"};
+            var user2 = new User {FirstName = "Pedro", LastName = "Faria"};
             Context.Add(user2);
             Context.SaveChanges();
 
@@ -55,5 +56,24 @@ namespace PoC.TestesServicos.Tests
 
             Assert.Equal(2, users.Length);
         }
+        
+        [Theory]
+        [InlineData("Israel", "Santiago")]
+        [InlineData("Carlos", "Pedrosa")]
+        [InlineData("Enzo", "Santiago")]
+        public async Task GetUsers_UsersInDb_ShouldReturnAddedUsersParametrized(string firstName, string lastName)
+        {
+            var user = new User {FirstName = firstName, LastName = lastName};
+            Context.Add(user);
+            Context.SaveChanges();
+
+            var users = await Client.GetAsync("api/users").DeserializeResponseAsync<User[]>();
+
+            Assert.Single(users);
+            Assert.Equal(firstName, users[0].FirstName);
+            Assert.Equal(lastName, users[0].LastName);
+        }        
+        
+        
     }
 }

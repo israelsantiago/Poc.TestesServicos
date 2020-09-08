@@ -15,18 +15,18 @@ namespace PoC.TestesServicos.Tests.Fixtures
         private readonly TestContextConfiguration _testtontexttonfiguration;
         private readonly string _usernamecouchbase;
         private readonly string _passwordCouchbase;
+        private readonly string _hostsCouchbase;
         private readonly string _mockeserverurl;
-        private readonly int _restportcouchbase;
+
         public IntegrationContainersAppFactory(TestContextConfiguration testContextConfigurationDb,
-                                               string userNameCouchBase, string passwordCouchbase, 
-                                               int restPortCouchbase, string mockeServerUrl)
+                                               string hostsCouchBase, string userNameCouchBase, string passwordCouchbase, 
+                                               string mockeServerUrl)
         {
             _testtontexttonfiguration = testContextConfigurationDb;
+            _hostsCouchbase = hostsCouchBase;
             _usernamecouchbase = userNameCouchBase;
             _passwordCouchbase = passwordCouchbase;
             _mockeserverurl = mockeServerUrl;
-            _restportcouchbase = restPortCouchbase;
-
         }
 
         private const string CEP_API_URL_SECTION = "CepApiOptions:Url";           
@@ -41,10 +41,9 @@ namespace PoC.TestesServicos.Tests.Fixtures
                 services.Replace(new ServiceDescriptor(typeof(IContextConfiguration), _testtontexttonfiguration));
    
                 var configuration = serviceProvider.GetRequiredService<IConfiguration>();
-                configuration["Couchbase:Hosts"] = "localhost";
+                configuration["Couchbase:Hosts"] = _hostsCouchbase;
                 configuration["Couchbase:Username"] = _usernamecouchbase;
                 configuration["Couchbase:Password"] = _passwordCouchbase;
-                configuration["Couchbase:UIPort"] = _restportcouchbase.ToString();
                 services.Replace(new ServiceDescriptor(typeof(IConfiguration), configuration));
 
             }).ConfigureAppConfiguration((context, configbuilder) =>

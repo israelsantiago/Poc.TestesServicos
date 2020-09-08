@@ -24,15 +24,18 @@ namespace PoC.TestesServicos.Tests.Fixtures
     {
         
         public MssqlContainerFixture mssqlContainerFixture { get; }
+        public TestContextConfiguration TestContextConfigurationDB { get; private set; }        
         public string ConnectionStringDB { get; private set; }
         
         public CouchbaseContainerFixture couchbaseContainerFixture { get; }
-        public TestContextConfiguration TestContextConfigurationDB { get; private set; }
+        public string hostCouchbase { get; private set; }
+        public string UserNameCouchBase { get; private set; }        
+        public string PasswordCouchbase { get; private set; }
+  
         private RabbitmqContainerFixture rabbitmqContainerFixture { get; }        
-        
-        public WireMockServer MockServer { get; private set; }        
-   
-        
+        public WireMockServer MockServer { get; private set; }    
+        public string MockeServerUrl { get; private set; }       
+       
         public IntegrationContainersAppFactory<TStartup> Factory;
         public HttpClient Client { get; private set; }
 
@@ -53,7 +56,7 @@ namespace PoC.TestesServicos.Tests.Fixtures
             var task2 = couchbaseContainerFixture.InitializeAsync();
             var task3 = rabbitmqContainerFixture.InitializeAsync();
             
-            Task allTasks = Task.WhenAll(task1, task2, task3);
+            Task allTasks = Task.WhenAll(task1,  task2, task3); 
             
             try
             {
@@ -74,18 +77,14 @@ namespace PoC.TestesServicos.Tests.Fixtures
                 MaxAutomaticRedirections = 7
             };
 
-            var ConnectionStringCouchBase = couchbaseContainerFixture.Container.ConnectionString;
-            var UserNameCouchBase = couchbaseContainerFixture.Container.Username;
-            var PasswordCouchbase = couchbaseContainerFixture.Container.Password;
-            var RestPortCouchbase = couchbaseContainerFixture.restPortHost;
+            hostCouchbase = couchbaseContainerFixture.Container.ConnectionString;
+            UserNameCouchBase = couchbaseContainerFixture.Container.Username;
+            PasswordCouchbase = couchbaseContainerFixture.Container.Password;
+            MockeServerUrl = MockServer.Urls.Single();
             
-            var  MockeServerUrl = MockServer.Urls.Single();
+            Factory = new IntegrationContainersAppFactory<TStartup>(TestContextConfigurationDB, hostCouchbase, UserNameCouchBase, PasswordCouchbase, MockeServerUrl);
             
-            Factory = new IntegrationContainersAppFactory<TStartup>(TestContextConfigurationDB, UserNameCouchBase, 
-                                                                    PasswordCouchbase, RestPortCouchbase, 
-                                                                    MockeServerUrl);
             Client = Factory.CreateClient(clientOptions);
-            
             
             using (var scope = Factory.Server.Host.Services.CreateScope())
             {
@@ -94,7 +93,6 @@ namespace PoC.TestesServicos.Tests.Fixtures
 
               context.Database.Migrate();
             }
-                        
         }
 
         public Task DisposeAsync()
@@ -103,10 +101,9 @@ namespace PoC.TestesServicos.Tests.Fixtures
             return Task.CompletedTask;
         }
 
-
         private WireMockServer SetupMockedServer()
         {
-            FluentMockServerSettings settings = new FluentMockServerSettings()
+            WireMockServerSettings settings = new WireMockServerSettings()
             {
                 ReadStaticMappings = true,
                 StartAdminInterface = true,

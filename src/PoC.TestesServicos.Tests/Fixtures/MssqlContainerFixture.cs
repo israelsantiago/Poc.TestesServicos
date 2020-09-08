@@ -13,7 +13,7 @@ namespace PoC.TestesServicos.Tests.Fixtures
         public MssqlContainerFixture()
         {
             var testcontainersBuilder = new TestcontainersBuilder<MsSqlTestcontainer>()
-                    //.WithImage() -- Alterar para a imagem do BS2
+                    //TODO .WithImage() -- Alterar para a imagem do BS2
                     .WithDatabase(new MsSqlTestcontainerConfiguration
                     {
                         Password =
