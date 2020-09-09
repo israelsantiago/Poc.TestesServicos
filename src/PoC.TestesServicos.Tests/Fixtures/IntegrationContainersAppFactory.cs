@@ -19,7 +19,9 @@ namespace PoC.TestesServicos.Tests.Fixtures
         private readonly string _mockeserverurl;
 
         public IntegrationContainersAppFactory(TestContextConfiguration testContextConfigurationDb,
-                                               string hostsCouchBase, string userNameCouchBase, string passwordCouchbase, 
+                                               string hostsCouchBase, 
+                                               string userNameCouchBase,
+                                               string passwordCouchbase, 
                                                string mockeServerUrl)
         {
             _testtontexttonfiguration = testContextConfigurationDb;
@@ -33,7 +35,7 @@ namespace PoC.TestesServicos.Tests.Fixtures
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
-            Dictionary<string, string> extraConfiguration = GetApiClientExtraConfiguration();
+            Dictionary<string, string> extraConfiguration = GetApiClientMockServerConfiguration();
             
             builder.ConfigureTestServices(services =>
             {
@@ -60,7 +62,7 @@ namespace PoC.TestesServicos.Tests.Fixtures
         /// This method creates configurations using mockserver url, that will be used by the API instead of configured in appsettings, this setup allows Wire Mock Server matches the http request mapped.
         /// </summary>
         /// <returns></returns>
-        private Dictionary<string, string> GetApiClientExtraConfiguration()
+        private Dictionary<string, string> GetApiClientMockServerConfiguration()
         {
             Dictionary<string, string> configuration = new Dictionary<string, string>();
             configuration.Add(CEP_API_URL_SECTION, _mockeserverurl);

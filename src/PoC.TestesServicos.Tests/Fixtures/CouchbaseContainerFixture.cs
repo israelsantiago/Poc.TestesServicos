@@ -34,9 +34,10 @@ namespace PoC.TestesServicos.Tests.Fixtures
       
         }
 
-        public async Task InitializeAsync()
+        public Task InitializeAsync()
         {
-            await Container.StartAsync();
+            return Container.StartAsync();
+
         }
        
         public Task DisposeAsync()

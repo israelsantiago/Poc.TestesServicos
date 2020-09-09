@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using PoC.TestesServicos.API;
 using PoC.TestesServicos.Data;
+using RabbitMQ.Client;
 using WireMock.Server;
 using WireMock.Settings;
 using Xunit;
@@ -93,14 +94,17 @@ namespace PoC.TestesServicos.Tests.Fixtures
 
               context.Database.Migrate();
             }
+            
+            var factory = new ConnectionFactory { Uri = new Uri(rabbitmqContainerFixture.Container.ConnectionString) };
+
+            using (var connection = factory.CreateConnection())
+            {
+                Assert.True(connection.IsOpen);
+            }
+                   
         }
 
-        public Task DisposeAsync()
-        {
-            this.Dispose();
-            return Task.CompletedTask;
-        }
-
+        
         private WireMockServer SetupMockedServer()
         {
             WireMockServerSettings settings = new WireMockServerSettings()
@@ -115,6 +119,12 @@ namespace PoC.TestesServicos.Tests.Fixtures
 
             return mockServer;
                 
+        }
+
+        public Task DisposeAsync()
+        {
+            this.Dispose();
+            return Task.CompletedTask;
         }
         
         public void Dispose()

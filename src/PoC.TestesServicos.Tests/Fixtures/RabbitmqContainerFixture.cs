@@ -1,40 +1,37 @@
 ﻿using System;
 using System.Threading.Tasks;
 using DotNet.Testcontainers.Containers.Builders;
-using DotNet.Testcontainers.Containers.Configurations.MessageBrokers;
 using DotNet.Testcontainers.Containers.Modules.MessageBrokers;
+using PoC.TestesServicos.Tests.Fixtures.Configurations.Rabbitmq;
 using RabbitMQ.Client;
 using Xunit;
 
 namespace PoC.TestesServicos.Tests.Fixtures
 {
-    public class RabbitmqContainerFixture
+    public class RabbitmqContainerFixture: IAsyncLifetime
     {
         public RabbitMqTestcontainer Container { get; }
-        
+
         public RabbitmqContainerFixture()
         {
             var testcontainersBuilder = new TestcontainersBuilder<RabbitMqTestcontainer>()
-                //TODO .WithImage() -- Alterar para a imagem do BS2
                 .WithMessageBroker(new RabbitMqTestcontainerConfiguration
                 {
                     Username = "rabbitmq",
                     Password = "rabbitmq",
-                });
-
+                })
+                .WithPortBinding(15672) // Rabbitmq admin port;
+                .WithMount(  "D:/dev/NET/Poc.TestesServicos/src/PoC.TestesServicos.Tests/rabbitmq/etc/definitions.json",
+                          "/etc/rabbitmq/definitions.json");  // Convenção sobre configuração, nesta versão do RabbitMQ 3.8.5, se o arquivo acima for 'montado'
+                                                                       // em /etc/rabbitmq/definitions, no startup do RabbitMQ, as definições serão importandas.
+                
             Container = testcontainersBuilder.Build();
         }     
         
-        public async Task InitializeAsync()
+        public Task InitializeAsync()
         {
-            await Container.StartAsync();
+            return Container.StartAsync();
             
-            var factory = new ConnectionFactory { Uri = new Uri(Container.ConnectionString) };
-
-            using (var connection = factory.CreateConnection())
-            {
-                Assert.True(connection.IsOpen);
-            }            
         }
 
         public Task DisposeAsync()
