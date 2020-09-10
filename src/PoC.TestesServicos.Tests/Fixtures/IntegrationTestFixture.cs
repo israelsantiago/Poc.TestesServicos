@@ -99,6 +99,9 @@ namespace PoC.TestesServicos.Tests.Fixtures
 
             using (var connection = factory.CreateConnection())
             {
+                
+                IModel channel = connection.CreateModel();
+                
                 Assert.True(connection.IsOpen);
             }
                    

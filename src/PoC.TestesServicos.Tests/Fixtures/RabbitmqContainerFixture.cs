@@ -21,6 +21,7 @@ namespace PoC.TestesServicos.Tests.Fixtures
                     Password = "rabbitmq",
                 })
                 .WithPortBinding(15672) // Rabbitmq admin port;
+                // TODO tratar de forma dinamica a localização do arquivo abaixo...
                 .WithMount(  "D:/dev/NET/Poc.TestesServicos/src/PoC.TestesServicos.Tests/rabbitmq/etc/definitions.json",
                           "/etc/rabbitmq/definitions.json");  // Convenção sobre configuração, nesta versão do RabbitMQ 3.8.5, se o arquivo acima for 'montado'
                                                                        // em /etc/rabbitmq/definitions, no startup do RabbitMQ, as definições serão importandas.

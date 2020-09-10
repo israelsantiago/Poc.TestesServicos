@@ -9,8 +9,7 @@ namespace PoC.TestesServicos.Tests.Fixtures.Configurations.Databases
 {
   public sealed class CouchbaseTestcontainerConfiguration : TestcontainerDatabaseConfiguration
   {
-    private const string CouchbaseImage = "mustafaonuraydin/couchbase-testcontainer:6.5.1";
-    private const string WaitUntilMessageIsLogged = "couchbase-dev started";
+    private const string CouchbaseImage = "btburnett3/couchbasefakeit:enterprise-6.5.1";  // TODO alterar para imagem BS2
     private const int DefaultClusterRamSize = 1024;
     private const int DefaultClusterIndexRamSize = 512;
     private const int DefaultClusterEventingRamSize = 256;
@@ -20,12 +19,12 @@ namespace PoC.TestesServicos.Tests.Fixtures.Configurations.Databases
     private readonly MemoryStream stdout = new MemoryStream();
     private readonly MemoryStream stderr = new MemoryStream();
 
-    public CouchbaseTestcontainerConfiguration(int defaultPort, int port)
-      : base(CouchbaseImage,  defaultPort, port)
+
+    public CouchbaseTestcontainerConfiguration()
+      : base(CouchbaseImage,  BootstrapHttpPort, BootstrapHttpPort)
     {
       this.OutputConsumer = Consume.RedirectStdoutAndStderrToStream((Stream) this.stderr, (Stream) this.stdout);
-      //this.WaitStrategy = Wait.ForUnixContainer().unUntilMessageIsLogged(this.OutputConsumer.Stdout, WaitUntilMessageIsLogged);
-      this.WaitStrategy = Wait.ForUnixContainer().UntilPortIsAvailable(8091);
+      this.WaitStrategy = Wait.ForUnixContainer().UntilPortIsAvailable(BootstrapHttpPort);
     }
 
     public string BucketName
