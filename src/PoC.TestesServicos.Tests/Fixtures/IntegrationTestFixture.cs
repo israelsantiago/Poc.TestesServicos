@@ -25,13 +25,14 @@ namespace PoC.TestesServicos.Tests.Fixtures
     {
         
         public MssqlContainerFixture mssqlContainerFixture { get; }
-        public TestContextConfiguration TestContextConfigurationDB { get; private set; }        
+        public TestConfigurationDb TestContextConfigurationDB { get; private set; }        
         public string ConnectionStringDB { get; private set; }
         
         public CouchbaseContainerFixture couchbaseContainerFixture { get; }
         public string hostCouchbase { get; private set; }
         public string UserNameCouchBase { get; private set; }        
         public string PasswordCouchbase { get; private set; }
+        public string BucketName { get; private set; }
   
         private RabbitmqContainerFixture rabbitmqContainerFixture { get; }        
         public WireMockServer MockServer { get; private set; }    
@@ -42,14 +43,12 @@ namespace PoC.TestesServicos.Tests.Fixtures
 
         public  IntegrationTestFixture()
         {
-            
             mssqlContainerFixture = new MssqlContainerFixture();
             couchbaseContainerFixture = new CouchbaseContainerFixture();
             rabbitmqContainerFixture = new RabbitmqContainerFixture();
             MockServer = SetupMockedServer();
-            
         }
-        
+      
         public async Task InitializeAsync()
         {
             
@@ -57,7 +56,7 @@ namespace PoC.TestesServicos.Tests.Fixtures
             var task2 = couchbaseContainerFixture.InitializeAsync();
             var task3 = rabbitmqContainerFixture.InitializeAsync();
             
-            Task allTasks = Task.WhenAll(task1,  task2, task3); 
+            Task allTasks = Task.WhenAll(task1, task2, task3); 
             
             try
             {
@@ -69,7 +68,7 @@ namespace PoC.TestesServicos.Tests.Fixtures
             }            
             
             ConnectionStringDB = mssqlContainerFixture.Container.ConnectionString;
-            TestContextConfigurationDB = new TestContextConfiguration(ConnectionStringDB);
+            TestContextConfigurationDB = new TestConfigurationDb(ConnectionStringDB);
 
             var clientOptions = new WebApplicationFactoryClientOptions()
             {
@@ -81,9 +80,11 @@ namespace PoC.TestesServicos.Tests.Fixtures
             hostCouchbase = couchbaseContainerFixture.Container.ConnectionString;
             UserNameCouchBase = couchbaseContainerFixture.Container.Username;
             PasswordCouchbase = couchbaseContainerFixture.Container.Password;
+            BucketName = couchbaseContainerFixture.BucketName;
+ 
             MockeServerUrl = MockServer.Urls.Single();
             
-            Factory = new IntegrationContainersAppFactory<TStartup>(TestContextConfigurationDB, hostCouchbase, UserNameCouchBase, PasswordCouchbase, MockeServerUrl);
+            Factory = new IntegrationContainersAppFactory<TStartup>(TestContextConfigurationDB, hostCouchbase, UserNameCouchBase, PasswordCouchbase, BucketName,  MockeServerUrl);
             
             Client = Factory.CreateClient(clientOptions);
             
@@ -95,6 +96,7 @@ namespace PoC.TestesServicos.Tests.Fixtures
               context.Database.Migrate();
             }
             
+            // Testes RabbitMQ
             var factory = new ConnectionFactory { Uri = new Uri(rabbitmqContainerFixture.Container.ConnectionString) };
 
             using (var connection = factory.CreateConnection())
@@ -104,10 +106,9 @@ namespace PoC.TestesServicos.Tests.Fixtures
                 
                 Assert.True(connection.IsOpen);
             }
-                   
+  
         }
-
-        
+      
         private WireMockServer SetupMockedServer()
         {
             WireMockServerSettings settings = new WireMockServerSettings()

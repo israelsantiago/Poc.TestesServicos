@@ -12,22 +12,25 @@ namespace PoC.TestesServicos.Tests.Fixtures
 {
     public class IntegrationContainersAppFactory<TStartup> : WebApplicationFactory<Startup> where TStartup : class
     {
-        private readonly TestContextConfiguration _testtontexttonfiguration;
+        private readonly TestConfigurationDb _testconfigurationDb;
+        private readonly string _hostsCouchbase;
         private readonly string _usernamecouchbase;
         private readonly string _passwordCouchbase;
-        private readonly string _hostsCouchbase;
+        private readonly string _bucketName;
         private readonly string _mockeserverurl;
 
-        public IntegrationContainersAppFactory(TestContextConfiguration testContextConfigurationDb,
+        public IntegrationContainersAppFactory(TestConfigurationDb testContextConfigurationDb,
                                                string hostsCouchBase, 
                                                string userNameCouchBase,
                                                string passwordCouchbase, 
+                                               string bucketName,
                                                string mockeServerUrl)
         {
-            _testtontexttonfiguration = testContextConfigurationDb;
+            _testconfigurationDb = testContextConfigurationDb;
             _hostsCouchbase = hostsCouchBase;
             _usernamecouchbase = userNameCouchBase;
             _passwordCouchbase = passwordCouchbase;
+            _bucketName = bucketName;
             _mockeserverurl = mockeServerUrl;
         }
 
@@ -39,13 +42,18 @@ namespace PoC.TestesServicos.Tests.Fixtures
             
             builder.ConfigureTestServices(services =>
             {
+                
                 var serviceProvider = services.BuildServiceProvider();
-                services.Replace(new ServiceDescriptor(typeof(IContextConfiguration), _testtontexttonfiguration));
+                services.Replace(new ServiceDescriptor(typeof(IContextConfiguration), _testconfigurationDb));
    
                 var configuration = serviceProvider.GetRequiredService<IConfiguration>();
                 configuration["Couchbase:Hosts"] = _hostsCouchbase;
                 configuration["Couchbase:Username"] = _usernamecouchbase;
                 configuration["Couchbase:Password"] = _passwordCouchbase;
+                configuration["Couchbase:BucketName"] = _bucketName;                
+                
+                configuration["ConnectionStrings:UsersDb"] = _testconfigurationDb.ConnectionString;
+                
                 services.Replace(new ServiceDescriptor(typeof(IConfiguration), configuration));
 
             }).ConfigureAppConfiguration((context, configbuilder) =>

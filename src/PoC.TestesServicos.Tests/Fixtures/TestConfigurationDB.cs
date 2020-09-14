@@ -2,9 +2,9 @@ using PoC.TestesServicos.Data;
 
 namespace PoC.TestesServicos.Tests.Fixtures
 {
-    public class TestContextConfiguration : IContextConfiguration
+    public class TestConfigurationDb : IContextConfiguration
     {
-        public TestContextConfiguration(string connectionString)
+        public TestConfigurationDb(string connectionString)
         {
             ConnectionString = connectionString;
         }

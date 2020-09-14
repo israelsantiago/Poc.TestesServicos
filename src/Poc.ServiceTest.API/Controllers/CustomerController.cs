@@ -27,7 +27,6 @@ namespace PoC.TestesServicos.API.Controllers
         {
             Customer customerResponse = await _customerService.GetCustomerByCode(code);
             
-            //Customer customerResponse = null;
             return Ok(customerResponse);
         }
     }

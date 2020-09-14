@@ -10,9 +10,9 @@ namespace PoC.TestesServicos.Tests.Fixtures
 {
     public class CouchbaseContainerFixture : IAsyncLifetime
     {
-        private const string UserNameCouchBase = "couchbase";
-        private const string PassWordCouchBase = "couchbase";
-        private const string BucketName = "customers";   
+        private const string UserNameCouchBase = "Administrator";
+        private const string PassWordCouchBase = "password";
+        public  string BucketName { get; private set; }= "default";   
       
         public CouchbaseTestcontainer Container { get; }
         
@@ -22,9 +22,9 @@ namespace PoC.TestesServicos.Tests.Fixtures
             var testcontainersBuilder = new TestcontainersBuilder<CouchbaseTestcontainer>()
                 .WithDatabase(new CouchbaseTestcontainerConfiguration
                 {
-                    Username = "couchbase",
-                    Password = "couchbase",
-                    BucketName = "customers"
+                    Username = UserNameCouchBase,
+                    Password = PassWordCouchBase,
+                    BucketName = BucketName
                 })
                 .WithPortBinding(8091)
                 .WithPortBinding(8093)
