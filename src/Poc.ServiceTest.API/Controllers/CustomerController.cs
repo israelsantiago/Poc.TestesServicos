@@ -18,7 +18,6 @@ namespace PoC.TestesServicos.API.Controllers
         {
             _customerService = customerService;
         }
-       
         
         [HttpGet("{code:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
