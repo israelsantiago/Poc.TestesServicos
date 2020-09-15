@@ -37,7 +37,7 @@ namespace PoC.TestesServicos.API
                 options.UseSqlServer(Configuration.GetConnectionString(Configuration.GetSection("ConnectionStrings:UsersDb").Value),
                     sqlServerOptionsAction: sqlOptions =>
                     {
-                        sqlOptions.EnableRetryOnFailure(maxRetryCount: 20, maxRetryDelay: TimeSpan.FromMinutes(10), errorNumbersToAdd: null);
+                        sqlOptions.EnableRetryOnFailure(maxRetryCount: 20, maxRetryDelay: TimeSpan.FromSeconds(10), errorNumbersToAdd: null);
                     });
             });            
     

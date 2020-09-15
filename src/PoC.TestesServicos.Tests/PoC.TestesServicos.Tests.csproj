@@ -32,6 +32,14 @@
     <None Update="Mappings\get_customer_ok.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Fixtures\Configurations\Servicevirtualizations\wiremock.net\Mappings\get_customer_ok.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Fixtures\Configurations\Messagebrokers" />
+    <Folder Include="Fixtures\Configurations\Servicevirtualizations\wiremock.net" />
   </ItemGroup>
 
 </Project>

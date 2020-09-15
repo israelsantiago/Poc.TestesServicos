@@ -20,7 +20,6 @@ namespace PoC.TestesServicos.Tests.Fixtures
     public class IntegrationApiTestFixtureCollection : ICollectionFixture<IntegrationTestFixture<StartupApiTests>>
     {
     }        
-   
     public class IntegrationTestFixture<TStartup> : IDisposable,  IAsyncLifetime where TStartup : class
     {
         
@@ -34,7 +33,9 @@ namespace PoC.TestesServicos.Tests.Fixtures
         public string PasswordCouchbase { get; private set; }
         public string BucketName { get; private set; }
   
-        private RabbitmqContainerFixture rabbitmqContainerFixture { get; }        
+        private RabbitmqContainerFixture rabbitmqContainerFixture { get; }     
+        
+        public MongodbContainerFixture mongodbContainerFixture { get; }        
         public WireMockServer MockServer { get; private set; }    
         public string MockeServerUrl { get; private set; }       
        
@@ -46,17 +47,21 @@ namespace PoC.TestesServicos.Tests.Fixtures
             mssqlContainerFixture = new MssqlContainerFixture();
             couchbaseContainerFixture = new CouchbaseContainerFixture();
             rabbitmqContainerFixture = new RabbitmqContainerFixture();
+            mongodbContainerFixture = new MongodbContainerFixture();
             MockServer = SetupMockedServer();
         }
       
         public async Task InitializeAsync()
         {
             
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+            
             var task1 = mssqlContainerFixture.InitializeAsync();
             var task2 = couchbaseContainerFixture.InitializeAsync();
             var task3 = rabbitmqContainerFixture.InitializeAsync();
+            var task4 = mongodbContainerFixture.InitializeAsync();
             
-            Task allTasks = Task.WhenAll(task1, task2, task3); 
+            Task allTasks = Task.WhenAll(task1, task2, task3, task4); 
             
             try
             {
@@ -66,6 +71,9 @@ namespace PoC.TestesServicos.Tests.Fixtures
             {
                 AggregateException allExceptions = allTasks.Exception;
             }            
+            
+            watch.Stop();
+            Console.WriteLine($"Execution Time: {watch.ElapsedMilliseconds} ms");
             
             ConnectionStringDB = mssqlContainerFixture.Container.ConnectionString;
             TestContextConfigurationDB = new TestConfigurationDb(ConnectionStringDB);
@@ -106,6 +114,8 @@ namespace PoC.TestesServicos.Tests.Fixtures
                 
                 Assert.True(connection.IsOpen);
             }
+            
+            // Teste MomgoDB !
   
         }
       
@@ -119,7 +129,7 @@ namespace PoC.TestesServicos.Tests.Fixtures
             };
 
             WireMockServer mockServer = WireMockServer.Start(settings);
-            mockServer.ReadStaticMappings("Mappings/");
+            mockServer.ReadStaticMappings("Fixtures/Configurations/Servicevirtualizations/wiremock.net/Mappings/");
 
             return mockServer;
                 
@@ -138,7 +148,8 @@ namespace PoC.TestesServicos.Tests.Fixtures
             
             mssqlContainerFixture.DisposeAsync();
             couchbaseContainerFixture.DisposeAsync();
-            rabbitmqContainerFixture.DisposeAsync();            
+            rabbitmqContainerFixture.DisposeAsync();
+            mongodbContainerFixture.DisposeAsync();
             
             MockServer.Stop();
             MockServer.Dispose();  

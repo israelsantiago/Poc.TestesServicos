@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using DotNet.Testcontainers.Containers.Builders;
-using DotNet.Testcontainers.Containers.Configurations.Databases;
 using DotNet.Testcontainers.Containers.Modules.Databases;
+using PoC.TestesServicos.Tests.Fixtures.Configurations.Databases;
 using Xunit;
 
 namespace PoC.TestesServicos.Tests.Fixtures
