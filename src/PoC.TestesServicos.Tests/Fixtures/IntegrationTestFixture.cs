@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using PoC.TestesServicos.API;
 using PoC.TestesServicos.Data;
+using PoC.TestesServicos.Tests.Fixtures.Configurations.Databases.mysql;
 using RabbitMQ.Client;
 using WireMock.Server;
 using WireMock.Settings;
@@ -35,7 +36,9 @@ namespace PoC.TestesServicos.Tests.Fixtures
   
         private RabbitmqContainerFixture rabbitmqContainerFixture { get; }     
         
-        public MongodbContainerFixture mongodbContainerFixture { get; }        
+        public MongodbContainerFixture mongodbContainerFixture { get; }       
+        
+        public MysqlContainerFixture mysqlContainerFixture { get; }               
         public WireMockServer MockServer { get; private set; }    
         public string MockeServerUrl { get; private set; }       
        
@@ -48,6 +51,7 @@ namespace PoC.TestesServicos.Tests.Fixtures
             couchbaseContainerFixture = new CouchbaseContainerFixture();
             rabbitmqContainerFixture = new RabbitmqContainerFixture();
             mongodbContainerFixture = new MongodbContainerFixture();
+            mysqlContainerFixture = new MysqlContainerFixture();
             MockServer = SetupMockedServer();
         }
       
@@ -60,8 +64,9 @@ namespace PoC.TestesServicos.Tests.Fixtures
             var task2 = couchbaseContainerFixture.InitializeAsync();
             var task3 = rabbitmqContainerFixture.InitializeAsync();
             var task4 = mongodbContainerFixture.InitializeAsync();
-            
-            Task allTasks = Task.WhenAll(task1, task2, task3, task4); 
+            var task5 = mysqlContainerFixture.InitializeAsync();
+
+            Task allTasks = Task.WhenAll(task1, task2, task3, task4, task5); 
             
             try
             {
@@ -115,7 +120,7 @@ namespace PoC.TestesServicos.Tests.Fixtures
                 Assert.True(connection.IsOpen);
             }
             
-            // Teste MomgoDB !
+            // Teste MongoDB !
   
         }
       
@@ -137,7 +142,7 @@ namespace PoC.TestesServicos.Tests.Fixtures
 
         public Task DisposeAsync()
         {
-            this.Dispose();
+            this?.Dispose();
             return Task.CompletedTask;
         }
         
@@ -150,6 +155,7 @@ namespace PoC.TestesServicos.Tests.Fixtures
             couchbaseContainerFixture.DisposeAsync();
             rabbitmqContainerFixture.DisposeAsync();
             mongodbContainerFixture.DisposeAsync();
+            mysqlContainerFixture.DisposeAsync();
             
             MockServer.Stop();
             MockServer.Dispose();  
