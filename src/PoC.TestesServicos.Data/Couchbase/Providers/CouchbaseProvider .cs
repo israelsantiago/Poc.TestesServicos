@@ -8,23 +8,17 @@ namespace PoC.TestesServicos.Data.Couchbase.Providers
 {
     public class CouchbaseProvider : ICouchbaseProvider
     {
-        private readonly IConfiguration _configuration;
         private IBucket _bucket;
         private ICluster _cluster;
-
-        public CouchbaseProvider(IConfiguration configuration)
-        {
-            _configuration = configuration;
-        }
-
+        
         public async Task<ICluster> GetCluster()
         {
             if (_cluster != null) return _cluster;
 
-            var hosts = _configuration.GetValue<string>("Couchbase:Hosts");
-            var username = _configuration.GetValue<string>("Couchbase:Username");
-            var password = _configuration.GetValue<string>("Couchbase:Password");
-           
+            var hosts    = Environment.GetEnvironmentVariable("COUCHBASE_HOSTS");
+            var username = Environment.GetEnvironmentVariable("COUCHBASE_USER_NAME");
+            var password = Environment.GetEnvironmentVariable("COUCHBASE_PASSWORD");
+            
             _cluster = await Cluster.ConnectAsync(hosts, username, password).ConfigureAwait(false);
             
             return _cluster;
@@ -34,7 +28,7 @@ namespace PoC.TestesServicos.Data.Couchbase.Providers
         {
             if (_bucket == null)
             {
-                var bucketName = _configuration.GetValue<string>("Couchbase:BucketName");
+                var bucketName = Environment.GetEnvironmentVariable("COUCHBASE_BUCKET_NAME");
 
                 var cluster = await GetCluster();
                 

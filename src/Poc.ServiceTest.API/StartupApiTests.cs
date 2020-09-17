@@ -16,30 +16,23 @@ namespace PoC.TestesServicos.API
 {
     public class StartupApiTests
     {
+        public IConfiguration Configuration { get; }
+        
         public StartupApiTests(IConfiguration configuration)
         {
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
-        
-
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             
+            var sqlserverconnectionstring = Environment.GetEnvironmentVariable("SQL_SERVER_CONNECTION_STRING");                           
+            
             services.Configure<CepApiOptions>(Configuration.GetSection(nameof(CepApiOptions)));
             
-            services.AddSingleton<IContextConfiguration, DataContextConfiguration>();
-   
-            services.AddDbContext<UsersDataContext>(options =>
-            {
-                options.UseSqlServer(Configuration.GetConnectionString(Configuration.GetSection("ConnectionStrings:UsersDb").Value),
-                    sqlServerOptionsAction: sqlOptions =>
-                    {
-                        sqlOptions.EnableRetryOnFailure(maxRetryCount: 20, maxRetryDelay: TimeSpan.FromSeconds(10), errorNumbersToAdd: null);
-                    });
-            });            
+            services.AddDbContext<UsersDataContext>();  
+            services.AddSingleton<IContextConfiguration, DataContextConfiguration>();            
     
             services.AddSingleton<ICouchbaseProvider, CouchbaseProvider>();
             services.AddSingleton<IDocumentsRepository, DocumentsRepository>();

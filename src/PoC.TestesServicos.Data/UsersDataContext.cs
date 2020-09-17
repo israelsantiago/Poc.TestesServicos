@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
 using PoC.TestesServicos.Data.Configurations;
 using PoC.TestesServicos.Data.Models;
 
@@ -18,7 +19,10 @@ namespace PoC.TestesServicos.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(_config.ConnectionString);
+            optionsBuilder.UseSqlServer(_config.ConnectionString, sqlServerOptionsAction: sqlOptions =>
+            {
+                sqlOptions.EnableRetryOnFailure(maxRetryCount: 20, maxRetryDelay: TimeSpan.FromSeconds(10), errorNumbersToAdd: null);
+            });            
             base.OnConfiguring(optionsBuilder);
         }
 

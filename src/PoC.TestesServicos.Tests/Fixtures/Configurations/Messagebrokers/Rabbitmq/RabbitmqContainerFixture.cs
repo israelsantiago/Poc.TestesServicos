@@ -1,10 +1,8 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using DotNet.Testcontainers.Containers.Builders;
 using DotNet.Testcontainers.Containers.Modules.MessageBrokers;
 using DotNet.Testcontainers.Services;
 using PoC.TestesServicos.Tests.Fixtures.Configurations.Rabbitmq;
-using RabbitMQ.Client;
 using Xunit;
 
 namespace PoC.TestesServicos.Tests.Fixtures

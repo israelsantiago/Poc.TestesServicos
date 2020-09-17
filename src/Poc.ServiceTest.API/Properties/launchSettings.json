@@ -14,7 +14,12 @@
       "launchBrowser": true,
       "launchUrl": "api/values",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "COUCHBASE_HOSTS": "teste1",
+        "COUCHBASE_USER_NAME": "teste2",
+        "COUCHBASE_PASSWORD": "teste3",
+        "COUCHBASE_BUCKET_NAME": "teste4",
+        "SQL_SERVER_CONNECTION_STRING": "teste5"
       }
     },
     "IntegrationContainers.API": {
@@ -22,7 +27,12 @@
       "launchBrowser": true,
       "launchUrl": "api/values",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "COUCHBASE_HOSTS": "teste1",
+        "COUCHBASE_USER_NAME": "teste2",
+        "COUCHBASE_PASSWORD": "teste3",
+        "COUCHBASE_BUCKET_NAME": "teste4",
+        "SQL_SERVER_CONNECTION_STRING": "teste5"
       },
       "applicationUrl": "http://localhost:5000"
     },

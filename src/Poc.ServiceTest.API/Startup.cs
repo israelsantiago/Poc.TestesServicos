@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -27,8 +29,14 @@ namespace PoC.TestesServicos.API
             
             services.Configure<CepApiOptions>(Configuration.GetSection(nameof(CepApiOptions)));
             
-            services.AddDbContext<UsersDataContext>();
-            services.AddSingleton<IContextConfiguration, DataContextConfiguration>();
+            services.AddDbContext<UsersDataContext>(options =>
+            {
+                options.UseSqlServer(Configuration.GetConnectionString(Configuration.GetSection("ConnectionStrings:UsersDb").Value),
+                    sqlServerOptionsAction: sqlOptions =>
+                    {
+                        sqlOptions.EnableRetryOnFailure(maxRetryCount: 20, maxRetryDelay: TimeSpan.FromSeconds(10), errorNumbersToAdd: null);
+                    });
+            });            
 
             services.AddSingleton<ICouchbaseProvider, CouchbaseProvider>();
             services.AddSingleton<IDocumentsRepository, DocumentsRepository>();
