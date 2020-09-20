@@ -15,9 +15,9 @@ namespace PoC.TestesServicos.Data.Couchbase.Providers
         {
             if (_cluster != null) return _cluster;
 
-            var hosts    = Environment.GetEnvironmentVariable("COUCHBASE_HOSTS");
-            var username = Environment.GetEnvironmentVariable("COUCHBASE_USER_NAME");
-            var password = Environment.GetEnvironmentVariable("COUCHBASE_PASSWORD");
+            string hosts    = Environment.GetEnvironmentVariable("COUCHBASE_HOSTS") ?? throw new ArgumentNullException(nameof(hosts), "Variável de ambiente COUCHBASE_HOSTS inexistente.");
+            string username = Environment.GetEnvironmentVariable("COUCHBASE_USER_NAME") ?? throw new ArgumentNullException(nameof(username), "Variável de ambiente COUCHBASE_USER_NAME inexistente.");            
+            string password = Environment.GetEnvironmentVariable("COUCHBASE_PASSWORD") ?? throw new ArgumentNullException(nameof(password), "Variável de ambiente COUCHBASE_PASSWORD inexistente.");        
             
             _cluster = await Cluster.ConnectAsync(hosts, username, password).ConfigureAwait(false);
             
@@ -28,7 +28,7 @@ namespace PoC.TestesServicos.Data.Couchbase.Providers
         {
             if (_bucket == null)
             {
-                var bucketName = Environment.GetEnvironmentVariable("COUCHBASE_BUCKET_NAME");
+                string bucketName = Environment.GetEnvironmentVariable("COUCHBASE_BUCKET_NAME") ?? throw new ArgumentNullException(nameof(bucketName), "Variável de ambiente COUCHBASE_BUCKET_NAME inexistente.");                
 
                 var cluster = await GetCluster();
                 

@@ -10,13 +10,7 @@ namespace PoC.TestesServicos.Tests.Fixtures
 {
     public class IntegrationContainersAppFactory<TStartup> : WebApplicationFactory<Startup> where TStartup : class
     {
-        private readonly string _connectionStringDb;
-        private readonly string _hostsCouchbase;
-        private readonly string _usernamecouchbase;
-        private readonly string _passwordCouchbase;
-        private readonly string _bucketName;
         private readonly string _mockeserverurl;
-        
         private const string CEP_API_URL_SECTION = "CepApiOptions:Url";           
 
         public IntegrationContainersAppFactory(string connectionStringDb,
@@ -26,29 +20,26 @@ namespace PoC.TestesServicos.Tests.Fixtures
                                                string bucketName,
                                                string mockeServerUrl)
         {
-            _connectionStringDb = connectionStringDb;
-            _hostsCouchbase = hostsCouchBase;
-            _usernamecouchbase = userNameCouchBase;
-            _passwordCouchbase = passwordCouchbase;
-            _bucketName = bucketName;
             _mockeserverurl = mockeServerUrl;
+            
+            Environment.SetEnvironmentVariable("COUCHBASE_HOSTS", hostsCouchBase);
+            Environment.SetEnvironmentVariable("COUCHBASE_USER_NAME", userNameCouchBase);
+            Environment.SetEnvironmentVariable("COUCHBASE_PASSWORD", passwordCouchbase);
+            Environment.SetEnvironmentVariable("COUCHBASE_BUCKET_NAME", bucketName);
+                
+            Environment.SetEnvironmentVariable("SQL_SERVER_CONNECTION_STRING", connectionStringDb);                
         }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
-            Dictionary<string, string> apiClientMockServerConfiguration = GetApiClientMockServerConfiguration();
-            
             builder.ConfigureTestServices(services =>
             {
-                Environment.SetEnvironmentVariable("COUCHBASE_HOSTS", _hostsCouchbase);
-                Environment.SetEnvironmentVariable("COUCHBASE_USER_NAME", _usernamecouchbase);
-                Environment.SetEnvironmentVariable("COUCHBASE_PASSWORD", _passwordCouchbase);
-                Environment.SetEnvironmentVariable("COUCHBASE_BUCKET_NAME", _bucketName);
+                // Hook for possible changes to injected services
                 
-                Environment.SetEnvironmentVariable("SQL_SERVER_CONNECTION_STRING", _connectionStringDb);                
-    
             }).ConfigureAppConfiguration((context, configbuilder) =>
             {
+                Dictionary<string, string> apiClientMockServerConfiguration = GetApiClientMockServerConfiguration();
+                
                 configbuilder.AddInMemoryCollection(apiClientMockServerConfiguration);
                 
             }).UseUrls("http://*:0")

@@ -16,6 +16,7 @@ namespace PoC.TestesServicos.API
 {
     public class StartupApiTests
     {
+        
         public IConfiguration Configuration { get; }
         
         public StartupApiTests(IConfiguration configuration)
@@ -27,12 +28,19 @@ namespace PoC.TestesServicos.API
         public void ConfigureServices(IServiceCollection services)
         {
             
-            var sqlserverconnectionstring = Environment.GetEnvironmentVariable("SQL_SERVER_CONNECTION_STRING");                           
+            string sqlserverconnectionstring = Environment.GetEnvironmentVariable("SQL_SERVER_CONNECTION_STRING") ?? throw new ArgumentNullException(nameof(sqlserverconnectionstring), 
+                                                                          "Variável de ambiente SQL_SERVER_CONNECTION_STRING inexistente.");
             
             services.Configure<CepApiOptions>(Configuration.GetSection(nameof(CepApiOptions)));
             
-            services.AddDbContext<UsersDataContext>();  
-            services.AddSingleton<IContextConfiguration, DataContextConfiguration>();            
+            services.AddDbContext<UsersDataContext>(options =>
+            {
+                options.UseSqlServer(sqlserverconnectionstring,
+                    sqlServerOptionsAction: sqlOptions =>
+                    {
+                        sqlOptions.EnableRetryOnFailure(maxRetryCount: 20, maxRetryDelay: TimeSpan.FromSeconds(10), errorNumbersToAdd: null);
+                    });
+            });                       
     
             services.AddSingleton<ICouchbaseProvider, CouchbaseProvider>();
             services.AddSingleton<IDocumentsRepository, DocumentsRepository>();
