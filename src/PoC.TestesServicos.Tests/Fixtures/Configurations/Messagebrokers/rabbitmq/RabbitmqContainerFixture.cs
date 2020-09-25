@@ -27,9 +27,12 @@ namespace PoC.TestesServicos.Tests.Fixtures
                 })
                 .WithPortBinding(AdminPortRabbitMqHost, AdminPortRabbitMq ) // Rabbitmq admin port;
                  // TODO tratar de forma dinamica a localização do arquivo abaixo...
-                .WithMount(  "C:/dev/NET/Poc.TestesServicos/src/PoC.TestesServicos.Test/Fixtures/Configurations/Messagebrokers/Rabbitmq/definitions.json",
+                .WithMount(  "C://dev//NET//Poc.TestesServicos//src//PoC.TestesServicos.Tests//bin//Debug//netcoreapp3.1//Fixtures//Configurations//Messagebrokers//Rabbitmq//definitions.json",
                           "/etc/rabbitmq/definitions.json");  // Convenção sobre configuração, nesta versão do RabbitMQ 3.8.5, se o arquivo definitions.json for 'montado'
                                                                        // em /etc/rabbitmq/definitions, no startup do RabbitMQ, as definições serão importandas.
+                                                                       //  _pactDirectory = $"{Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.Parent.FullName}/pacts/updated-pact.json";
+     
+                                                                   
             Container = testcontainersBuilder.Build();
         }     
         

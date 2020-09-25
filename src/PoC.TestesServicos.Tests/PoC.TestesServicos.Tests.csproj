@@ -35,11 +35,20 @@
     <None Update="Fixtures\Configurations\Servicevirtualizations\wiremock.net\Mappings\get_customer_ok.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Fixtures\Configurations\Messagebrokers\Rabbitmq\definitions.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Fixtures\Configurations\Messagebrokers" />
+    <Folder Include="Common" />
+    <Folder Include="Component" />
+    <Folder Include="Contract" />
+    <Folder Include="Fixtures\Configurations\Databases\cassandra" />
+    <Folder Include="Fixtures\Configurations\Messagebrokers\ibmmq" />
     <Folder Include="Fixtures\Configurations\Servicevirtualizations\wiremock.net" />
+    <Folder Include="Integration" />
+    <Folder Include="unit" />
   </ItemGroup>
 
 </Project>
