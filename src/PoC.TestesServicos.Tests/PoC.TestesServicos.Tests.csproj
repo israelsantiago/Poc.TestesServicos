@@ -10,8 +10,16 @@
 
   <ItemGroup>
     <PackageReference Include="CouchbaseNetClient" Version="3.0.5" />
+    <PackageReference Include="coverlet.collector" Version="1.3.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="coverlet.msbuild" Version="2.9.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="DotNet.Testcontainers" Version="1.4.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="3.1.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="3.1.8" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
     <PackageReference Include="RabbitMQ.Client" Version="6.2.1" />
     <PackageReference Include="Respawn" Version="3.3.0" />
@@ -32,9 +40,6 @@
     <None Update="Mappings\get_customer_ok.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Fixtures\Configurations\Servicevirtualizations\wiremock.net\Mappings\get_customer_ok.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="Fixtures\Configurations\Messagebrokers\Rabbitmq\definitions.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -49,6 +54,17 @@
     <Folder Include="Fixtures\Configurations\Servicevirtualizations\wiremock.net" />
     <Folder Include="Integration" />
     <Folder Include="unit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Fixtures\Configurations\Messagebrokers\rabbitmq\definitions.json" />
+    <Content Include="Fixtures\Configurations\Messagebrokers\rabbitmq\definitions.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <None Remove="Fixtures\Configurations\Servicevirtualizations\wiremock.net\Mappings\get_customer_ok.json" />
+    <Content Include="Fixtures\Configurations\Servicevirtualizations\wiremock.net\Mappings\get_customer_ok.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

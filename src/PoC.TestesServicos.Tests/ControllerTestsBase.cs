@@ -23,7 +23,7 @@ namespace PoC.TestesServicos.Tests
             Client = integrationContainersFixture.Client;
             _scope = integrationContainersFixture.Factory.Server.Host.Services.CreateScope();
             //_integrationContainersFixture = integrationContainersFixture;
-            _connectionStringDB = integrationContainersFixture.ConnectionStringDB;
+            _connectionStringDB = integrationContainersFixture.ConnectionStringDb;
             _checkpoint = new Checkpoint();
             Context = _scope.ServiceProvider.GetRequiredService<UsersDataContext>();
         }

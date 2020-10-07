@@ -23,17 +23,17 @@ namespace PoC.TestesServicos.Tests.Fixtures
     }        
     public class IntegrationTestFixture<TStartup> : IDisposable,  IAsyncLifetime where TStartup : class
     {
-        public MssqlContainerFixture mssqlContainerFixture { get; }
-        public string ConnectionStringDB { get; private set; }
+        public MssqlContainerFixture MssqlContainerFixture { get; }
+        public string ConnectionStringDb { get; private set; }
         
-        public CouchbaseContainerFixture couchbaseContainerFixture { get; }
-        public string hostCouchbase { get; private set; }
+        public CouchbaseContainerFixture CouchbaseContainerFixture { get; }
+        public string HostCouchbase { get; private set; }
         public string UserNameCouchBase { get; private set; }        
         public string PasswordCouchbase { get; private set; }
         public string BucketName { get; private set; }
-        private RabbitmqContainerFixture rabbitmqContainerFixture { get; }     
-        public MongodbContainerFixture mongodbContainerFixture { get; }       
-        public MysqlContainerFixture mysqlContainerFixture { get; }               
+        private RabbitmqContainerFixture RabbitmqContainerFixture { get; }     
+        public MongodbContainerFixture MongodbContainerFixture { get; }       
+        public MysqlContainerFixture MysqlContainerFixture { get; }               
         public WireMockServer MockServer { get; private set; }    
         public string MockeServerUrl { get; private set; }       
 
@@ -42,22 +42,22 @@ namespace PoC.TestesServicos.Tests.Fixtures
 
         public  IntegrationTestFixture()
         {
-            mssqlContainerFixture = new MssqlContainerFixture();
-            couchbaseContainerFixture = new CouchbaseContainerFixture();
-            rabbitmqContainerFixture = new RabbitmqContainerFixture();
-            mongodbContainerFixture = new MongodbContainerFixture();
-            mysqlContainerFixture = new MysqlContainerFixture();
+            MssqlContainerFixture = new MssqlContainerFixture();
+            CouchbaseContainerFixture = new CouchbaseContainerFixture();
+            RabbitmqContainerFixture = new RabbitmqContainerFixture();
+            MongodbContainerFixture = new MongodbContainerFixture();
+            MysqlContainerFixture = new MysqlContainerFixture();
             MockServer = SetupMockedServer();
         }
       
         public async Task InitializeAsync()
         {
   
-            var task1 = mssqlContainerFixture.InitializeAsync();
-            var task2 = couchbaseContainerFixture.InitializeAsync();
-            var task3 = rabbitmqContainerFixture.InitializeAsync();
-            var task4 = mongodbContainerFixture.InitializeAsync();
-            var task5 = mysqlContainerFixture.InitializeAsync();
+            var task1 = MssqlContainerFixture.InitializeAsync();
+            var task2 = CouchbaseContainerFixture.InitializeAsync();
+            var task3 = RabbitmqContainerFixture.InitializeAsync();
+            var task4 = MongodbContainerFixture.InitializeAsync();
+            var task5 = MysqlContainerFixture.InitializeAsync();
 
             Task allTasks = Task.WhenAll(task1, task2, task3, task4, task5); 
             
@@ -70,7 +70,7 @@ namespace PoC.TestesServicos.Tests.Fixtures
                 AggregateException allExceptions = allTasks.Exception;
             }            
             
-            ConnectionStringDB = mssqlContainerFixture.Container.ConnectionString;
+            ConnectionStringDb = MssqlContainerFixture.Container.ConnectionString;
 
             var clientOptions = new WebApplicationFactoryClientOptions()
             {
@@ -79,14 +79,14 @@ namespace PoC.TestesServicos.Tests.Fixtures
                 MaxAutomaticRedirections = 7
             };
 
-            hostCouchbase = couchbaseContainerFixture.Container.ConnectionString;
-            UserNameCouchBase = couchbaseContainerFixture.Container.Username;
-            PasswordCouchbase = couchbaseContainerFixture.Container.Password;
-            BucketName = couchbaseContainerFixture.BucketName;
+            HostCouchbase = CouchbaseContainerFixture.Container.ConnectionString;
+            UserNameCouchBase = CouchbaseContainerFixture.Container.Username;
+            PasswordCouchbase = CouchbaseContainerFixture.Container.Password;
+            BucketName = CouchbaseContainerFixture.BucketName;
  
             MockeServerUrl = MockServer.Urls.Single();
             
-            Factory = new IntegrationContainersAppFactory<TStartup>(ConnectionStringDB, hostCouchbase, UserNameCouchBase, PasswordCouchbase, BucketName,  MockeServerUrl);
+            Factory = new IntegrationContainersAppFactory<TStartup>(ConnectionStringDb, HostCouchbase, UserNameCouchBase, PasswordCouchbase, BucketName,  MockeServerUrl);
             
             Client = Factory.CreateClient(clientOptions);
             
@@ -126,11 +126,11 @@ namespace PoC.TestesServicos.Tests.Fixtures
             Client.Dispose();
             Factory.Dispose();
             
-            mssqlContainerFixture.DisposeAsync();
-            couchbaseContainerFixture.DisposeAsync();
-            rabbitmqContainerFixture.DisposeAsync();
-            mongodbContainerFixture.DisposeAsync();
-            mysqlContainerFixture.DisposeAsync();
+            MssqlContainerFixture.DisposeAsync();
+            CouchbaseContainerFixture.DisposeAsync();
+            RabbitmqContainerFixture.DisposeAsync();
+            MongodbContainerFixture.DisposeAsync();
+            MysqlContainerFixture.DisposeAsync();
             
             MockServer.Stop();
             MockServer.Dispose();  

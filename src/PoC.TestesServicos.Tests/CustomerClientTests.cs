@@ -6,6 +6,7 @@ using PoC.TestesServicos.Data.Models;
 using PoC.TestesServicos.Tests.Fixtures;
 using Xunit;
 
+[assembly: AssemblyTrait("Category", "SkipWhenLiveUnitTesting")]
 namespace PoC.TestesServicos.Tests
 {
     [Collection(nameof(IntegrationApiTestFixtureCollection))]
