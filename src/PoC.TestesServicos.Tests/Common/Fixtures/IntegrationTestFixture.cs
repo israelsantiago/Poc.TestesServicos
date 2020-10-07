@@ -109,10 +109,9 @@ namespace PoC.TestesServicos.Tests.Fixtures
             };
 
             WireMockServer mockServer = WireMockServer.Start(settings);
-            mockServer.ReadStaticMappings("Fixtures/Configurations/Servicevirtualizations/wiremock.net/mappings/");
+            mockServer.ReadStaticMappings("Common/Fixtures/Servicevirtualizations/wiremock.net/mappings/");
 
             return mockServer;
-                
         }
 
         public Task DisposeAsync()
