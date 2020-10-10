@@ -1,13 +1,12 @@
 ﻿using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using PoC.TestesServicos.API;
 using PoC.TestesServicos.Data.Models;
-using PoC.TestesServicos.Tests.Fixtures;
+using PoC.TestesServicos.Tests.Service.Common;
 using Xunit;
 
 [assembly: AssemblyTrait("Category", "SkipWhenLiveUnitTesting")]
-namespace PoC.TestesServicos.Tests
+namespace PoC.TestesServicos.Tests.Service
 {
     [Collection(nameof(IntegrationApiTestFixtureCollection))]
     public class CustomerClientTests : ControllerTestsBase

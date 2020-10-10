@@ -47,8 +47,6 @@
 
   <ItemGroup>
     <Folder Include="Common" />
-    <Folder Include="Common\Fixtures\Configurations" />
-    <Folder Include="Service" />
     <Folder Include="Contract" />
     <Folder Include="Integration" />
     <Folder Include="Unit" />

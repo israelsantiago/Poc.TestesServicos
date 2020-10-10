@@ -7,14 +7,13 @@ using PoC.TestesServicos.Tests.Fixtures;
 using Respawn;
 using Xunit;
 
-namespace PoC.TestesServicos.Tests
+namespace PoC.TestesServicos.Tests.Service.Common
 {
     public abstract class ControllerTestsBase : IAsyncLifetime
     {
         private readonly Checkpoint _checkpoint;
-        private readonly string _connectionStringDB;
+        private readonly string _connectionStringSqlServer;
         private readonly IServiceScope _scope;
-        //private readonly IntegrationContainersAppFactory _integrationContainersFixture;
         protected HttpClient Client { get; }
         protected UsersDataContext Context { get; }
 
@@ -22,8 +21,7 @@ namespace PoC.TestesServicos.Tests
         {
             Client = integrationContainersFixture.Client;
             _scope = integrationContainersFixture.Factory.Server.Host.Services.CreateScope();
-            //_integrationContainersFixture = integrationContainersFixture;
-            _connectionStringDB = integrationContainersFixture.ConnectionStringDb;
+            _connectionStringSqlServer = integrationContainersFixture.ConnectionStringSqlServer;
             _checkpoint = new Checkpoint();
             Context = _scope.ServiceProvider.GetRequiredService<UsersDataContext>();
         }
@@ -32,7 +30,7 @@ namespace PoC.TestesServicos.Tests
 
         public Task InitializeAsync()
         {
-            return _checkpoint.Reset(_connectionStringDB);
+            return _checkpoint.Reset(_connectionStringSqlServer);
         }
 
         public Task DisposeAsync()

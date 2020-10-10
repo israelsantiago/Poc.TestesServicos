@@ -4,11 +4,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
-using PoC.TestesServicos.API;
 
-namespace PoC.TestesServicos.Tests.Fixtures
+namespace PoC.TestesServicos.Tests.Service.Common
 {
-    public class IntegrationContainersAppFactory<TStartup> : WebApplicationFactory<Startup> where TStartup : class
+    public class IntegrationContainersAppFactory<TStartup> : WebApplicationFactory<TStartup> where TStartup : class
     {
         private readonly string _mockeserverurl;
         private const string CEP_API_URL_SECTION = "CepApiOptions:Url";           
@@ -32,6 +31,7 @@ namespace PoC.TestesServicos.Tests.Fixtures
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
+
             builder.ConfigureTestServices(services =>
             {
                 // Hook for possible changes to injected services

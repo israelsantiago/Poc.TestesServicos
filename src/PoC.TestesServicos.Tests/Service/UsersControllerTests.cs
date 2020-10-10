@@ -1,13 +1,11 @@
-using System.IO;
 using System.Net;
 using System.Threading.Tasks;
-using PoC.TestesServicos.API;
 using PoC.TestesServicos.Data.Models;
 using PoC.TestesServicos.Tests.Extensions;
-using PoC.TestesServicos.Tests.Fixtures;
+using PoC.TestesServicos.Tests.Service.Common;
 using Xunit;
 
-namespace PoC.TestesServicos.Tests
+namespace PoC.TestesServicos.Tests.Service
 {
     [Collection(nameof(IntegrationApiTestFixtureCollection))]
     public class UsersControllerTests : ControllerTestsBase

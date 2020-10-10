@@ -1,21 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using DotNet.Testcontainers.Services;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using PoC.TestesServicos.API;
 using PoC.TestesServicos.Data;
+using PoC.TestesServicos.Tests.Fixtures;
 using PoC.TestesServicos.Tests.Fixtures.Configurations.Databases.mysql;
-using RabbitMQ.Client;
 using WireMock.Server;
 using WireMock.Settings;
 using Xunit;
 
-namespace PoC.TestesServicos.Tests.Fixtures
+namespace PoC.TestesServicos.Tests.Service.Common
 {
     [CollectionDefinition(nameof(IntegrationApiTestFixtureCollection))]
     public class IntegrationApiTestFixtureCollection : ICollectionFixture<IntegrationTestFixture<StartupApiTests>>
@@ -24,7 +21,7 @@ namespace PoC.TestesServicos.Tests.Fixtures
     public class IntegrationTestFixture<TStartup> : IDisposable,  IAsyncLifetime where TStartup : class
     {
         public MssqlContainerFixture MssqlContainerFixture { get; }
-        public string ConnectionStringDb { get; private set; }
+        public string ConnectionStringSqlServer { get; private set; }
         
         public CouchbaseContainerFixture CouchbaseContainerFixture { get; }
         public string HostCouchbase { get; private set; }
@@ -70,14 +67,7 @@ namespace PoC.TestesServicos.Tests.Fixtures
                 AggregateException allExceptions = allTasks.Exception;
             }            
             
-            ConnectionStringDb = MssqlContainerFixture.Container.ConnectionString;
-
-            var clientOptions = new WebApplicationFactoryClientOptions()
-            {
-                HandleCookies = false,
-                AllowAutoRedirect = true,
-                MaxAutomaticRedirections = 7
-            };
+            ConnectionStringSqlServer = MssqlContainerFixture.Container.ConnectionString;
 
             HostCouchbase = CouchbaseContainerFixture.Container.ConnectionString;
             UserNameCouchBase = CouchbaseContainerFixture.Container.Username;
@@ -86,7 +76,14 @@ namespace PoC.TestesServicos.Tests.Fixtures
  
             MockeServerUrl = MockServer.Urls.Single();
             
-            Factory = new IntegrationContainersAppFactory<TStartup>(ConnectionStringDb, HostCouchbase, UserNameCouchBase, PasswordCouchbase, BucketName,  MockeServerUrl);
+            Factory = new IntegrationContainersAppFactory<TStartup>(ConnectionStringSqlServer, HostCouchbase, UserNameCouchBase, PasswordCouchbase, BucketName,  MockeServerUrl);
+
+            var clientOptions = new WebApplicationFactoryClientOptions()
+            {
+                HandleCookies = false,
+                AllowAutoRedirect = true,
+                MaxAutomaticRedirections = 7
+            };
             
             Client = Factory.CreateClient(clientOptions);
             
